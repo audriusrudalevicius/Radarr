@@ -13,7 +13,7 @@ namespace NzbDrone.Core.Parser
     {
         private static readonly Logger Logger = NzbDroneLogger.GetLogger(typeof(LanguageParser));
 
-        private static readonly Regex LanguageRegex = new Regex(@"(?:\W|_|^)(?<italian>\b(?:ita|italian)\b)|(?<german>german\b|videomann)|(?<flemish>flemish)|(?<greek>greek)|(?<french>(?:\W|_)(?:FR|VOSTFR|VO|VFF|VFQ|VF2|TRUEFRENCH)(?:\W|_))|(?<russian>\brus\b)|(?<dutch>nl\W?subs?)|(?<hungarian>\b(?:HUNDUB|HUN)\b)|(?<hebrew>\bHebDub\b)|(?<czech>\b(?:CZ|SK)\b)",
+        private static readonly Regex LanguageRegex = new Regex(@"(?:\W|_|^)(?<italian>\b(?:ita|italian)\b)|(?<german>german\b|videomann)|(?<flemish>flemish)|(?<greek>greek)|(?<french>(?:\W|_)(?:FR|VOSTFR|VO|VFF|VFQ|VF2|TRUEFRENCH)(?:\W|_))|(?<russian>\b(?:rus|RU)\b)|(?<dutch>nl\W?subs?)|(?<hungarian>\b(?:HUNDUB|HUN)\b)|(?<hebrew>\bHebDub\b)|(?<czech>\b(?:CZ|SK)\b)|(?<lithuanian>\b(?:lt|lit)\b)|(?<english>\ben|eng\b)",
                                                                 RegexOptions.IgnoreCase | RegexOptions.Compiled);
 
         private static readonly Regex SubtitleLanguageRegex = new Regex(".+?[-_. ](?<iso_code>[a-z]{2,3})(?:[-_. ]forced)?$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
@@ -86,38 +86,48 @@ namespace NzbDrone.Core.Parser
             if (lowerTitle.Contains("czech"))
                 languages.Add( Language.Czech);
 
-            var match = LanguageRegex.Match(title);
+            if (lowerTitle.Contains("lithuanian"))
+                languages.Add(Language.Lithuanian);
 
-            if (match.Groups["italian"].Captures.Cast<Capture>().Any())
-                languages.Add( Language.Italian);
+            var matches = LanguageRegex.Matches(title);
+            foreach (Match match in matches)
+            {
+                if (match.Groups["italian"].Captures.Cast<Capture>().Any())
+                    languages.Add( Language.Italian);
 
-            if (match.Groups["german"].Captures.Cast<Capture>().Any())
-                languages.Add( Language.German);
+                if (match.Groups["german"].Captures.Cast<Capture>().Any())
+                    languages.Add( Language.German);
 
-            if (match.Groups["flemish"].Captures.Cast<Capture>().Any())
-                languages.Add( Language.Flemish);
+                if (match.Groups["flemish"].Captures.Cast<Capture>().Any())
+                    languages.Add( Language.Flemish);
 
-            if (match.Groups["greek"].Captures.Cast<Capture>().Any())
-                languages.Add( Language.Greek);
+                if (match.Groups["greek"].Captures.Cast<Capture>().Any())
+                    languages.Add( Language.Greek);
 
-            if (match.Groups["french"].Success)
-                languages.Add( Language.French);
+                if (match.Groups["french"].Success)
+                    languages.Add( Language.French);
 
-            if (match.Groups["russian"].Success)
-                languages.Add( Language.Russian);
+                if (match.Groups["russian"].Success)
+                    languages.Add( Language.Russian);
 
-            if (match.Groups["dutch"].Success)
-                languages.Add( Language.Dutch);
+                if (match.Groups["dutch"].Success)
+                    languages.Add( Language.Dutch);
 
-            if (match.Groups["hungarian"].Success)
-                languages.Add( Language.Hungarian);
+                if (match.Groups["hungarian"].Success)
+                    languages.Add( Language.Hungarian);
 
-            if (match.Groups["hebrew"].Success)
-                languages.Add( Language.Hebrew);
+                if (match.Groups["hebrew"].Success)
+                    languages.Add( Language.Hebrew);
 
-            if (match.Groups["czech"].Success)
-                languages.Add( Language.Czech);
+                if (match.Groups["czech"].Success)
+                    languages.Add( Language.Czech);
 
+                if (match.Groups["lithuanian"].Success)
+                    languages.Add( Language.Lithuanian);
+
+                if (match.Groups["english"].Success)
+                    languages.Add( Language.English);
+            }
 
             return languages.DistinctBy(l => (int)l).ToList();
         }

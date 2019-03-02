@@ -38,9 +38,10 @@ namespace NzbDrone.Core.Test.ParserTests
         [TestCase("Revolution S01E03 No Quarter 2012 WEB-DL 720p Nordic-philipo mkv", Language.Norwegian)]
         [TestCase("Constantine.2014.S01E01.WEBRiP.H264.AAC.5.1-NL.SUBS", Language.Dutch)]
         [TestCase("Castle.2009.S01E14.HDTV.XviD.HUNDUB-LOL", Language.Hungarian)]
-        [TestCase("Castle.2009.S01E14.HDTV.XviD.ENG.HUN-LOL", Language.Hungarian)]
+        [TestCase("Castle.2009.S01E14.HDTV.XviD.ENG.HUN-LOL", Language.Hungarian, Language.English)]
         [TestCase("Castle.2009.S01E14.HDTV.XviD.HUN-LOL", Language.Hungarian)]
         [TestCase("Castle.2009.S01E14.HDTV.XviD.CZ-LOL", Language.Czech)]
+        [TestCase("Castle.2009.S01E14.Lithuanian.HDTV.XviD-LOL", Language.Lithuanian)]
         [TestCase("Passengers.2016.German.DL.AC3.Dubbed.1080p.WebHD.h264.iNTERNAL-PsO", Language.German)]
         [TestCase("Der.Soldat.James.German.Bluray.FuckYou.Pso.Why.cant.you.follow.scene.rules.1998", Language.German)]
         [TestCase("Passengers.German.DL.AC3.Dubbed..BluRay.x264-PsO", Language.German)]
@@ -49,6 +50,10 @@ namespace NzbDrone.Core.Test.ParserTests
         [TestCase("The Danish Girl 2015", Language.English)]
         [TestCase("Nocturnal Animals (2016) MULTi VFQ English [1080p] BluRay x264-PopHD", Language.English, Language.French)]
         [TestCase("Wonder.Woman.2017.720p.BluRay.DD5.1.x264-TayTO.CZ-FTU", Language.Czech)]
+        [TestCase("Wonder.Woman.2017.720p.BluRay.DD5.1.x264-TayTO.LT-FTU", Language.Lithuanian)]
+        [TestCase("Bohemian.Rhapsody.2018.1080p.BDRip.[LT-LTsub-EN-RU]", Language.Lithuanian, Language.English, Language.Russian)]
+        [TestCase("A.Traveler's.Guide.to.the.Planets.2010.HDRip.x264.AAC.LT.EN - Nauris", Language.Lithuanian, Language.English)]
+        [TestCase("Japan.Earths.Enchanted.Islands.2015.BluRay.Remux.x264.AAC.LT.EN.RU - Nauris", Language.Lithuanian, Language.English, Language.Russian)]
         [TestCase("Fantastic.Beasts.The.Crimes.Of.Grindelwald.2018.2160p.WEBRip.x265.10bit.HDR.DD5.1-GASMASK", Language.English)]
         public void should_parse_language(string postTitle, params Language[] languages)
         {
@@ -68,6 +73,9 @@ namespace NzbDrone.Core.Test.ParserTests
         [TestCase("2 Broke Girls - S01E01 - Pilot.sub", Language.Unknown)]
         [TestCase("2 Broke Girls - S01E01 - Pilot.eng.forced.sub", Language.English)]
         [TestCase("2 Broke Girls - S01E01 - Pilot-eng-forced.sub", Language.English)]
+        [TestCase("2 Broke Girls - S01E01 - Pilot-lit-forced.sub", Language.Lithuanian)]
+        [TestCase("2 Broke Girls - S01E01 - Pilot-lt-forced.sub", Language.Lithuanian)]
+        [TestCase("2 Broke Girls - S01E01 - Pilot-ru-forced.sub", Language.Russian)]
         public void should_parse_subtitle_language(string fileName, Language language)
         {
             var result = LanguageParser.ParseSubtitleLanguage(fileName);
