@@ -1,7 +1,5 @@
 var _ = require('underscore');
 var Marionette = require('marionette');
-var LanguageCollection = require('../Language/LanguageCollection');
-var Config = require('../../../Config');
 var AsModelBoundView = require('../../../Mixins/AsModelBoundView');
 var AsValidatedView = require('../../../Mixins/AsValidatedView');
 require('../../../Mixins/TagInput');
@@ -21,12 +19,6 @@ var view = Marionette.ItemView.extend({
 					allowDuplicates: true,
 					tagClass  : 'label label-success'
 			});
-		},
-
-		templateHelpers : function() {
-				return {
-						languages : LanguageCollection.toJSON()
-				};
 		},
 
 		getCutoff : function() {

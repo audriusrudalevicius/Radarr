@@ -73,7 +73,7 @@ namespace NzbDrone.Core.Indexers.Newznab
                 //Also use alt titles for searching.
                 foreach (String altTitle in altTitles)
                 {
-                    var searchAltTitle = System.Web.HttpUtility.UrlPathEncode(Parser.Parser.ReplaceGermanUmlauts(Parser.Parser.NormalizeTitle(altTitle)));
+                    var searchAltTitle = System.Web.HttpUtility.UrlPathEncode(Parser.Parser.ReplaceLanguageSpecificLetters(Parser.Parser.NormalizeTitle(altTitle)));
                     var queryString = $"&q={searchAltTitle}";
                     if (!Settings.RemoveYear)
                     {
@@ -114,7 +114,7 @@ namespace NzbDrone.Core.Indexers.Newznab
                 }
             }
         }
-        
+
         public Func<IDictionary<string, string>> GetCookies { get; set; }
         public Action<IDictionary<string, string>, DateTime?> CookiesUpdater { get; set; }
     }

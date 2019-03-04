@@ -12,6 +12,7 @@ namespace NzbDrone.Core.Profiles
         public Profile()
         {
             FormatItems = new List<ProfileFormatItem>();
+            PreferredLanguages = new List<ProfileLanguageItem> { new ProfileLanguageItem { Language = Language.Unknown, Allowed = true }};
         }
 
         public string Name { get; set; }
@@ -20,6 +21,7 @@ namespace NzbDrone.Core.Profiles
         public CustomFormat FormatCutoff { get; set; }
         public List<ProfileFormatItem> FormatItems { get; set; }
         public List<string> PreferredTags { get; set; }
+        public List<ProfileLanguageItem> PreferredLanguages { get; set; }
         public Language Language { get; set; }
 
         public Quality LastAllowedQuality()

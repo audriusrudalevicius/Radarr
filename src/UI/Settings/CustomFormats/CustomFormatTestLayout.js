@@ -103,8 +103,6 @@ module.exports = Marionette.Layout.extend({
             model: model
         });
 
-        console.log(cell);
-
         this.matchedFormats.show(cell);
 
         this.matchesGrid.show(new Backgrid.Grid({

@@ -1,10 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using FluentValidation;
 using NzbDrone.Common.Extensions;
 using NzbDrone.Core.CustomFormats;
+using NzbDrone.Core.Parser;
 using NzbDrone.Core.Profiles;
-using NzbDrone.Core.Validation;
 
 namespace NzbDrone.Api.Profiles
 {
@@ -20,7 +21,13 @@ namespace NzbDrone.Api.Profiles
             SharedValidator.RuleFor(c => c.Name).NotEmpty();
             SharedValidator.RuleFor(c => c.Cutoff).NotNull();
             SharedValidator.RuleFor(c => c.Items).MustHaveAllowedQuality();
-            SharedValidator.RuleFor(c => c.Language).ValidLanguage();
+            SharedValidator.RuleFor(c => c.PreferredLanguages.Where(resource => resource.Allowed)).NotEmpty()
+                .WithMessage("Preferred languages should not be empty");
+            SharedValidator.RuleFor(c => c.PreferredLanguages).Must(list =>
+            {
+                var all = Enum.GetValues(typeof(Language)).Cast<int>().ToList();
+                return list.Where(resource => resource.Allowed).Select(resource => resource.Id).Except(all).Empty();
+            }).WithMessage("Invalid languages selected");
             SharedValidator.RuleFor(c => c.FormatItems).Must(items =>
             {
                 var all = _formatService.All().Select(f => f.Id).ToList();
@@ -28,9 +35,11 @@ namespace NzbDrone.Api.Profiles
                 var ids = items.Select(i => i.Format.Id);
 
                 return all.Except(ids).Empty();
-            }).WithMessage("All Custom Formats and no extra ones need to be present inside your Profile! Try refreshing your browser.");
+            }).WithMessage(
+                "All Custom Formats and no extra ones need to be present inside your Profile! Try refreshing your browser.");
             SharedValidator.RuleFor(c => c.FormatCutoff)
-                .Must(c => _formatService.All().Select(f => f.Id).Contains(c.Id) || c.Id == CustomFormat.None.Id).WithMessage("The Custom Format Cutoff must be a valid Custom Format! Try refreshing your browser.");
+                .Must(c => _formatService.All().Select(f => f.Id).Contains(c.Id) || c.Id == CustomFormat.None.Id)
+                .WithMessage("The Custom Format Cutoff must be a valid Custom Format! Try refreshing your browser.");
 
             GetResourceAll = GetAll;
             GetResourceById = GetById;

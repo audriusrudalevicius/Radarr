@@ -28,7 +28,7 @@ namespace NzbDrone.Core.MetadataSource.SkyHook
     {
         private readonly IHttpClient _httpClient;
         private readonly Logger _logger;
-        
+
         private readonly IHttpRequestBuilderFactory _movieBuilder;
         private readonly ITmdbConfigService _configService;
         private readonly IMovieService _movieService;
@@ -54,7 +54,12 @@ namespace NzbDrone.Core.MetadataSource.SkyHook
 
         public Movie GetMovieInfo(int TmdbId, Profile profile = null, bool hasPreDBEntry = false)
         {
-            var langCode = profile != null ? IsoLanguages.Get(profile.Language)?.TwoLetterCode ?? "en" : "en";
+            var langCode = profile != null ? IsoLanguages
+                                                 .Get(profile.PreferredLanguages.ConvertAll(item => item.Language).First())?
+                                                 .TwoLetterCode ?? "en" : "en";
+            var langCodes = profile != null
+                ? profile.PreferredLanguages.ConvertAll(l => IsoLanguages.Get(l.Language)?.TwoLetterCode).FindAll(s => s != null)
+                : new List<string> {langCode};
 
             var request = _movieBuilder.Create()
                .SetSegment("route", "movie")
@@ -122,11 +127,15 @@ namespace NzbDrone.Core.MetadataSource.SkyHook
 
             foreach (var alternativeTitle in resource.alternative_titles.titles)
             {
-                if (alternativeTitle.iso_3166_1.ToLower() == langCode)
+                foreach (var candidateLangCode in langCodes)
                 {
-                    altTitles.Add(new AlternativeTitle(alternativeTitle.title, SourceType.TMDB, TmdbId, IsoLanguages.Find(alternativeTitle.iso_3166_1.ToLower())?.Language ?? Language.English));
+                    if (alternativeTitle.iso_3166_1.ToLower() == candidateLangCode && IsoLanguages.Find(alternativeTitle.iso_3166_1.ToLower())?.Language != null)
+                    {
+                        altTitles.Add(new AlternativeTitle(alternativeTitle.title, SourceType.TMDB, TmdbId, IsoLanguages.Find(alternativeTitle.iso_3166_1.ToLower()).Language));
+                    }
                 }
-                else if (alternativeTitle.iso_3166_1.ToLower() == "us")
+
+                if (alternativeTitle.iso_3166_1.ToLower() == "us")
                 {
                     altTitles.Add(new AlternativeTitle(alternativeTitle.title, SourceType.TMDB, TmdbId, Language.English));
                 }
@@ -155,6 +164,11 @@ namespace NzbDrone.Core.MetadataSource.SkyHook
                     }
                 }
                 movie.Year = lowestYear.Min();
+                if (movie.Year != lowestYear.Max())
+                {
+                    movie.SecondaryYear = lowestYear.Max();
+                    movie.SecondaryYearSourceId = (int) SourceType.TMDB;
+                }
             }
 
             movie.TitleSlug += "-" + movie.TmdbId.ToString();
@@ -302,7 +316,7 @@ namespace NzbDrone.Core.MetadataSource.SkyHook
                 }
             }
 
-            movie.AlternativeTitles.AddRange(altTitles);
+            movie.AlternativeTitles.AddRange(altTitles.Distinct());
 
             return movie;
         }

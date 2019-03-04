@@ -120,7 +120,7 @@ namespace NzbDrone.Core.NetImport
                 return;
             }
 
-            var result = Fetch(0, true);
+            var result = Fetch(message.listId, true);
             var listedMovies = result.Movies.ToList();
 
             if (!result.AnyFailure)

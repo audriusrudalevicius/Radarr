@@ -10,6 +10,46 @@
     <div class="modal-body">
         <div class="form-horizontal">
             <div id="x-fields"></div>
+            <div class="form-group advanced-setting">
+                <label class="col-sm-3 control-label">Add languages</label>
+
+                <div class="col-sm-3">
+                    <div class="controls">
+                        <select class="form-control" id="x-language-select">
+                            {{#each languages}}
+                                {{#unless_eq nameLower compare="unknown"}}
+                                    <option value="{{id}}" data-id="{{id}}" data-name="{{name}}"
+                                            {{#if_eq nameLower compare="any"}}class="advanced-setting"{{/if_eq}}>
+                                        {{name}}
+                                    </option>
+                                {{/unless_eq}}
+                            {{/each}}
+                        </select>
+                    </div>
+                </div>
+                <div class="col-sm-2">
+                    <div class="controls">
+                        <button class="btn btn-sm x-language-add">Add Language</button>
+                    </div>
+                </div>
+
+                <div class="col-sm-1 help-inline">
+                    <i class="icon-radarr-form-info" title="Add another language to preferred languages list"></i>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="col-sm-3 control-label">Languages</label>
+                <div class="col-sm-5">
+                    <div class="controls preferred-languages">
+                        <span id="x-preferred-languages"></span>
+                    </div>
+                </div>
+                <div class="col-sm-1 help-inline">
+                    <i class="icon-radarr-form-info" title="Sorted list of preferred languages"></i>
+                </div>
+            </div>
+
             <div class="form-group">
                 <label class="col-sm-3 control-label">Qualities</label>
 

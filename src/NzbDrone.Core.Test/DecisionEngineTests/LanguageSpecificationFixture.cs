@@ -12,7 +12,6 @@ using NzbDrone.Core.Movies;
 namespace NzbDrone.Core.Test.DecisionEngineTests
 {
     [TestFixture]
-
     public class LanguageSpecificationFixture : CoreTest
     {
         private RemoteMovie _remoteMovie;
@@ -27,12 +26,19 @@ namespace NzbDrone.Core.Test.DecisionEngineTests
                     Languages = new List<Language> {Language.English}
                 },
                 Movie = new Movie
-                         {
-                             Profile = new LazyLoaded<Profile>(new Profile
-                                                               {
-                                                                   Language = Language.English
-                                                               })
-                         }
+                {
+                    Profile = new LazyLoaded<Profile>(new Profile
+                    {
+                        PreferredLanguages = new List<ProfileLanguageItem>
+                        {
+                            new ProfileLanguageItem
+                            {
+                                Language = Language.English,
+                                Allowed = true
+                            }
+                        }
+                    })
+                }
             };
         }
 
@@ -67,7 +73,14 @@ namespace NzbDrone.Core.Test.DecisionEngineTests
         {
             _remoteMovie.Movie.Profile = new LazyLoaded<Profile>(new Profile
             {
-                Language = Language.Any
+                PreferredLanguages = new List<ProfileLanguageItem>
+                {
+                    new ProfileLanguageItem
+                    {
+                        Language = Language.Any,
+                        Allowed = true
+                    }
+                }
             });
 
             WithGermanRelease();

@@ -1,7 +1,7 @@
-﻿﻿using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
- using NzbDrone.Api.Qualities;
- using NzbDrone.Api.REST;
+using NzbDrone.Api.Qualities;
+using NzbDrone.Api.REST;
 using NzbDrone.Core.Parser;
 using NzbDrone.Core.Profiles;
 using NzbDrone.Core.Qualities;
@@ -16,13 +16,19 @@ namespace NzbDrone.Api.Profiles
         public List<ProfileQualityItemResource> Items { get; set; }
         public CustomFormatResource FormatCutoff { get; set; }
         public List<ProfileFormatItemResource> FormatItems { get; set; }
-        public Language Language { get; set; }
+        public List<ProfileLanguageItemResource> PreferredLanguages { get; set; }
     }
 
     public class ProfileQualityItemResource : RestResource
     {
         public Quality Quality { get; set; }
         public bool Allowed { get; set; }
+    }
+
+    public class ProfileLanguageItemResource : RestResource
+    {
+        public bool Allowed { get; set; }
+        public string Name { get; set; }
     }
 
     public class ProfileFormatItemResource : RestResource
@@ -47,7 +53,19 @@ namespace NzbDrone.Api.Profiles
                 Items = model.Items.ConvertAll(ToResource),
                 FormatCutoff = model.FormatCutoff.ToResource(),
                 FormatItems = model.FormatItems.ConvertAll(ToResource),
-                Language = model.Language
+                PreferredLanguages = model.PreferredLanguages.ConvertAll(ToResource)
+            };
+        }
+
+        public static ProfileLanguageItemResource ToResource(this ProfileLanguageItem model)
+        {
+            if (model == null) return null;
+
+            return new ProfileLanguageItemResource
+            {
+                Id = (int) model.Language,
+                Allowed = model.Allowed,
+                Name = model.Language.ToString()
             };
         }
 
@@ -85,10 +103,21 @@ namespace NzbDrone.Api.Profiles
                 Items = resource.Items.ConvertAll(ToModel),
                 FormatCutoff = resource.FormatCutoff.ToModel(),
                 FormatItems = resource.FormatItems.ConvertAll(ToModel),
-                Language = resource.Language
+                PreferredLanguages = resource.PreferredLanguages.FindAll(itemResource => itemResource.Allowed).ToList().ConvertAll(ToModel)
             };
         }
 
+        public static ProfileLanguageItem ToModel(this ProfileLanguageItemResource itemResource)
+        {
+            if (itemResource == null) return null;
+
+            return new ProfileLanguageItem
+            {
+
+                Allowed = itemResource.Allowed,
+                Language = (Language) itemResource.Id
+            };
+        }
         public static ProfileQualityItem ToModel(this ProfileQualityItemResource resource)
         {
             if (resource == null) return null;

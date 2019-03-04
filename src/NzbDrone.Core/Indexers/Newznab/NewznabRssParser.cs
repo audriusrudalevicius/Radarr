@@ -155,7 +155,7 @@ namespace NzbDrone.Core.Indexers.Newznab
             if (!imdbTitle.IsNullOrWhiteSpace())
             {
                 return CultureInfo.CurrentCulture.TextInfo.ToTitleCase(
-                    Parser.Parser.ReplaceGermanUmlauts(
+                    Parser.Parser.ReplaceLanguageSpecificLetters(
                         Parser.Parser.NormalizeTitle(imdbTitle).Replace(" ", ".")
                     )
                  );

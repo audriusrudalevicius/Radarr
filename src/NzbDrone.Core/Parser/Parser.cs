@@ -337,9 +337,10 @@ namespace NzbDrone.Core.Parser
             return "";
         }
 
-        public static string ReplaceGermanUmlauts(string s)
+        public static string ReplaceLanguageSpecificLetters(string s)
         {
             var t = s;
+            // German Umlauts
             t = t.Replace("ä", "ae");
             t = t.Replace("ö", "oe");
             t = t.Replace("ü", "ue");
@@ -347,6 +348,16 @@ namespace NzbDrone.Core.Parser
             t = t.Replace("Ö", "Oe");
             t = t.Replace("Ü", "Ue");
             t = t.Replace("ß", "ss");
+            // Lithuanian letters
+            t = t.Replace("ą", "a");
+            t = t.Replace("č", "c");
+            t = t.Replace("ę", "e");
+            t = t.Replace("ė", "e");
+            t = t.Replace("į", "i");
+            t = t.Replace("š", "s");
+            t = t.Replace("ų", "u");
+            t = t.Replace("ū", "u");
+            t = t.Replace("ž", "z");
             return t;
         }
 
@@ -393,7 +404,7 @@ namespace NzbDrone.Core.Parser
             if (long.TryParse(title, out number))
                 return title;
 
-            return ReplaceGermanUmlauts(NormalizeRegex.Replace(title, string.Empty).ToLower()).RemoveAccent();
+            return ReplaceLanguageSpecificLetters(NormalizeRegex.Replace(title, string.Empty).ToLower()).RemoveAccent();
         }
 
         public static string NormalizeEpisodeTitle(string title)

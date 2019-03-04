@@ -113,14 +113,25 @@ namespace NzbDrone.Core.Profiles
                             .Select(v => new ProfileQualityItem { Quality = v.Quality, Allowed = allowed.Contains(v.Quality) })
                             .ToList();
 
-            var profile = new Profile { Name = name, Cutoff = cutoff, Items = items, Language = Language.English, FormatCutoff = CustomFormat.None, FormatItems = new List<ProfileFormatItem>
+            var profile = new Profile
             {
-                new ProfileFormatItem
+                Name = name,
+                Cutoff = cutoff,
+                Items = items,
+                FormatCutoff = CustomFormat.None,
+                FormatItems = new List<ProfileFormatItem>
                 {
-                    Allowed = true,
-                    Format = CustomFormat.None
+                    new ProfileFormatItem
+                    {
+                        Allowed = true,
+                        Format = CustomFormat.None
+                    }
+                },
+                PreferredLanguages = new List<ProfileLanguageItem>
+                {
+                    new ProfileLanguageItem { Language = Language.English, Allowed = true }
                 }
-            }};
+            };
 
             return Add(profile);
         }

@@ -1,16 +1,16 @@
 var _ = require('underscore');
 var vent = require('vent');
-var AppLayout = require('../../../AppLayout');
 var Marionette = require('marionette');
 var Backbone = require('backbone');
-var EditProfileItemView = require('./EditProfileItemView');
 var QualitySortableCollectionView = require('./QualitySortableCollectionView');
+var SortablePreferredLanguagesView = require('./LanguageSortableCollectionView');
 var EditProfileView = require('./EditProfileView');
 var DeleteView = require('../DeleteProfileView');
 var FullMovieCollection = require('../../../Movies/FullMovieCollection');
 var NetImportCollection = require('../../NetImport/NetImportCollection');
 var Config = require('../../../Config');
 var AsEditModalView = require('../../../Mixins/AsEditModalView');
+var LanguageCollection = require('../Language/LanguageCollection');
 
 var view = Marionette.Layout.extend({
     template : 'Settings/Profile/Edit/EditProfileLayoutTemplate',
@@ -18,7 +18,12 @@ var view = Marionette.Layout.extend({
     regions : {
         fields    : '#x-fields',
         qualities : '#x-qualities',
+        preferredLanguages : '#x-preferred-languages',
         formats   : '#x-formats'
+    },
+
+    events : {
+        'click .x-language-add' : '_addLanguage'
     },
 
     ui : {
@@ -33,8 +38,15 @@ var view = Marionette.Layout.extend({
         this.netImportCollection = new NetImportCollection();
         this.netImportCollection.fetch();
         this.formatItemsCollection = new Backbone.Collection(_.toArray(this.model.get('formatItems')).reverse());
+        this.preferredLanguagesCollection = new Backbone.Collection(_.toArray(this.model.get('preferredLanguages')).reverse());
         this.listenTo(FullMovieCollection, 'all', this._updateDisableStatus);
         this.listenTo(this.netImportCollection, 'all', this._updateDisableStatus);
+    },
+
+    templateHelpers : function() {
+        return {
+            languages : LanguageCollection.toJSON()
+        };
     },
 
     onRender : function() {
@@ -75,6 +87,25 @@ var view = Marionette.Layout.extend({
         }));
         this.qualities.show(this.sortableListView);
 
+        this.sortablePreferredLanguagesView = new SortablePreferredLanguagesView({
+            selectable     : true,
+            selectMultiple : true,
+            clickToSelect  : true,
+            clickToToggle  : true,
+            sortable: advancedShown,
+
+            sortableOptions : {
+                handle : '.x-drag-handle'
+            },
+
+            collection : this.preferredLanguagesCollection,
+            model      : this.model
+        });
+        this.sortablePreferredLanguagesView.setSelectedModels(this.preferredLanguagesCollection.filter(function(item) {
+            return item.get('allowed') === true;
+        }));
+
+        this.preferredLanguages.show(this.sortablePreferredLanguagesView);
         this.sortableFormatListView = new QualitySortableCollectionView({
             selectable     : true,
             selectMultiple : true,
@@ -88,9 +119,7 @@ var view = Marionette.Layout.extend({
 
             visibleModelsFilter : function(model) {
                 var quality = model.get('format');
-                console.log(quality);
                 if (quality) {
-                    console.log(quality);
                     return quality.id !== 0 || advancedShown;
                 }
 
@@ -104,6 +133,9 @@ var view = Marionette.Layout.extend({
             return item.get('allowed') === true;
         }));
         this.formats.show(this.sortableFormatListView);
+
+        this.listenTo(this.sortablePreferredLanguagesView, 'selectionChanged', this._selectionChanged);
+        this.listenTo(this.sortablePreferredLanguagesView, 'sortStop', this._updateModel);
 
         this.listenTo(this.sortableListView, 'selectionChanged', this._selectionChanged);
         this.listenTo(this.sortableListView, 'sortStop', this._updateModel);
@@ -138,6 +170,7 @@ var view = Marionette.Layout.extend({
     _updateModel : function() {
         this.model.set('items', this.itemsCollection.toJSON().reverse());
         this.model.set('formatItems', this.formatItemsCollection.toJSON().reverse());
+        this.model.set('preferredLanguages', this.preferredLanguagesCollection.toJSON().reverse());
 
         this._showFieldsView();
     },
@@ -162,6 +195,17 @@ var view = Marionette.Layout.extend({
 
     _isQualityInUsebyList : function() {
         return this.netImportCollection.where({ 'profileId' : this.model.id }).length !== 0;
+    },
+
+    _addLanguage : function (e) {
+        e.preventDefault();
+
+        var languageSelector = this.$('#x-language-select').first();
+        var item = languageSelector.find(':selected').data();
+        this.preferredLanguagesCollection.add(_.extend(item, {allowed: true}));
+        this.sortablePreferredLanguagesView.setSelectedModels(this.preferredLanguagesCollection.filter(function(item) {
+            return item.get('allowed') === true;
+        }));
     }
 });
 module.exports = AsEditModalView.call(view);

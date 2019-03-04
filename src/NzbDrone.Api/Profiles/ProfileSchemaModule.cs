@@ -1,7 +1,8 @@
-﻿﻿using System.Collections.Generic;
+﻿﻿using System;
+using System.Collections.Generic;
 using System.Linq;
- using NzbDrone.Core.CustomFormats;
- using NzbDrone.Core.Parser;
+using NzbDrone.Core.CustomFormats;
+using NzbDrone.Core.Parser;
 using NzbDrone.Core.Profiles;
 using NzbDrone.Core.Qualities;
 
@@ -44,7 +45,13 @@ namespace NzbDrone.Api.Profiles
             profile.Items = items;
             profile.FormatCutoff = CustomFormat.None;
             profile.FormatItems = formatItems;
-            profile.Language = Language.English;
+            profile.PreferredLanguages = Enum.GetValues(typeof(Language)).Cast<Language>()
+                .Select(language => new ProfileLanguageItem
+                {
+                    Language = language,
+                    Allowed = language == Language.Any
+                })
+                .ToList();
 
             return new List<ProfileResource> { profile.ToResource() };
         }

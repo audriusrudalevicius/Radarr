@@ -11,7 +11,7 @@ var Collection = PagableCollection.extend({
     bestMatch : undefined,
     parse: function(response) {
         this.matchedFormats = response.matchedFormats;
-        console.warn("test");
+
         return response.matches;
     },
 

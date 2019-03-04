@@ -459,7 +459,7 @@ namespace NzbDrone.Core.Parser
                         return $"Could not find {RemoteMovie.ParsedMovieInfo.MovieTitle}";
                         break;
                     case MappingResultType.WrongYear:
-                        return $"Failed to map movie, expected year {RemoteMovie.Movie.Year}, but found {RemoteMovie.ParsedMovieInfo.Year}";
+                        return $"Failed to map movie, expected year {RemoteMovie.Movie.Year} or {RemoteMovie.Movie.SecondaryYear}, but found {RemoteMovie.ParsedMovieInfo.Year}";
                     case MappingResultType.WrongTitle:
                         var comma = RemoteMovie.Movie.AlternativeTitles.Count > 0 ? ", " : "";
                         return
