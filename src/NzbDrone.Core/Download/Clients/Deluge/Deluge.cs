@@ -35,6 +35,12 @@ namespace NzbDrone.Core.Download.Clients.Deluge
 
         protected override string AddFromMagnetLink(RemoteMovie remoteMovie, string hash, string magnetLink)
         {
+            var existing = _proxy.GetTorrents(Settings).Where(torrent => torrent.Hash == hash).FirstOrDefault(null);
+            if (existing != null)
+            {
+                return existing.Hash.ToUpper();
+            }
+            
             var actualHash = _proxy.AddTorrentFromMagnet(magnetLink, Settings);
 
             if (!Settings.MovieCategory.IsNullOrWhiteSpace())
@@ -55,6 +61,12 @@ namespace NzbDrone.Core.Download.Clients.Deluge
 
         protected override string AddFromTorrentFile(RemoteMovie remoteMovie, string hash, string filename, byte[] fileContent)
         {
+            var existing = _proxy.GetTorrents(Settings).Where(torrent => torrent.Hash == hash).FirstOrDefault(null);
+            if (existing != null)
+            {
+                return existing.Hash.ToUpper();
+            }
+            
             var actualHash = _proxy.AddTorrentFromFile(filename, fileContent, Settings);
 
             if (!Settings.MovieCategory.IsNullOrWhiteSpace())
