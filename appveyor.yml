@@ -2,6 +2,17 @@ version: '0.2.0.{build}'
 
 image: Visual Studio 2017
 
+deploy:
+- provider: BinTray
+  username: audriusrudalevicius
+  api_key:
+    secure: QJ7b55I6sg4bLjEqV4CM7xHq1bTltfGLgH+nhUAZKhWdUQT97qdwg8BiOx8vYedz
+  subject: radarr
+  repo: radarr
+  package: radarr
+  artifact: _artifacts\*
+  publish: true
+
 assembly_info:
   patch: true
   file: 'src\NzbDrone.Common\Properties\SharedAssemblyInfo.cs'
