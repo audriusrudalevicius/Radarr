@@ -140,6 +140,7 @@ namespace NzbDrone.Core.NetImport
                 if (mapped != null && !_exclusionService.IsMovieExcluded(mapped.TmdbId))
                 {
                     mapped.AddOptions = new AddMovieOptions {SearchForMovie = true};
+                    if (_movieService.MovieExists(mapped)) continue;
                     try
                     {
                         _movieService.AddMovie(mapped);
