@@ -134,32 +134,20 @@ namespace NzbDrone.Core.NetImport
                 _logger.Info($"Found {listedMovies.Count()} movies on your auto enabled lists not in your library");
             }
 
-
-            var importExclusions = new List<string>();
-
-            //var downloadedCount = 0;
             foreach (var movie in listedMovies)
             {
                 var mapped = _movieSearch.MapMovieToTmdbMovie(movie);
                 if (mapped != null && !_exclusionService.IsMovieExcluded(mapped.TmdbId))
                 {
-                    //List<DownloadDecision> decisions;
                     mapped.AddOptions = new AddMovieOptions {SearchForMovie = true};
-                    _movieService.AddMovie(mapped);
-
-                    //// Search for movie
-                    //try
-                    //{
-                    //    decisions = _nzbSearchService.MovieSearch(mapped.Id, false);
-                    //}
-                    //catch (Exception ex)
-                    //{
-                    //    _logger.Error(ex, $"Unable to search in list for movie {mapped.Id}");
-                    //    continue;
-                    //}
-
-                    //var processed = _processDownloadDecisions.ProcessDecisions(decisions);
-                    //downloadedCount += processed.Grabbed.Count;
+                    try
+                    {
+                        _movieService.AddMovie(mapped);
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.Error(ex, $"Unable to add movie {mapped.Title} ({mapped.TitleSlug})");
+                    }
                 }
                 else
                 {
@@ -169,8 +157,6 @@ namespace NzbDrone.Core.NetImport
                     }
                 }
             }
-
-            //_logger.ProgressInfo("Movie search completed. {0} reports downloaded.", downloadedCount);
         }
 
         private void CleanLibrary(List<Movie> movies)

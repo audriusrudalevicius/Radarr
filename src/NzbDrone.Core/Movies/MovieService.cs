@@ -436,6 +436,15 @@ namespace NzbDrone.Core.Movies
                 }
             }
 
+            if (movie.TitleSlug.IsNotNullOrWhiteSpace())
+            {
+                result = _movieRepository.FindByTitleSlug(movie.TitleSlug);
+                if (result != null)
+                {
+                    return true;
+                }
+            }
+
             if (movie.Year > 1850)
             {
                 result = _movieRepository.FindByTitle(movie.Title.CleanSeriesTitle(), movie.Year);
