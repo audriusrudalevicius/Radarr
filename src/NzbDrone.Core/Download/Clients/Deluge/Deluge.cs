@@ -35,10 +35,9 @@ namespace NzbDrone.Core.Download.Clients.Deluge
 
         protected override string AddFromMagnetLink(RemoteMovie remoteMovie, string hash, string magnetLink)
         {
-            var existing = _proxy.GetTorrents(Settings).Where(torrent => torrent.Hash == hash).FirstOrDefault(null);
-            if (existing != null)
+            if (IsHashAlreadyAdded(hash))
             {
-                return existing.Hash.ToUpper();
+                return hash;
             }
             
             var actualHash = _proxy.AddTorrentFromMagnet(magnetLink, Settings);
@@ -61,10 +60,9 @@ namespace NzbDrone.Core.Download.Clients.Deluge
 
         protected override string AddFromTorrentFile(RemoteMovie remoteMovie, string hash, string filename, byte[] fileContent)
         {
-            var existing = _proxy.GetTorrents(Settings).Where(torrent => torrent.Hash == hash).FirstOrDefault(null);
-            if (existing != null)
+            if (IsHashAlreadyAdded(hash))
             {
-                return existing.Hash.ToUpper();
+                return hash;
             }
             
             var actualHash = _proxy.AddTorrentFromFile(filename, fileContent, Settings);
@@ -286,6 +284,26 @@ namespace NzbDrone.Core.Download.Clients.Deluge
             }
 
             return null;
+        }
+
+        private bool IsHashAlreadyAdded(string hash)
+        {
+            DelugeTorrent existing = null; 
+            
+            if (!Settings.MovieCategory.IsNullOrWhiteSpace())
+            {
+                existing = _proxy
+                    .GetTorrentsByLabel(Settings.MovieCategory, Settings)
+                    .FirstOrDefault(torrent => torrent.Hash.ToUpper() == hash);
+            }
+            else
+            {
+                existing = _proxy
+                    .GetTorrents(Settings)
+                    .FirstOrDefault(torrent => torrent.Hash.ToUpper() == hash);
+            }
+
+            return existing != null;
         }
     }
 }
