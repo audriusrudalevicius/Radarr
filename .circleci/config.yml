@@ -140,10 +140,10 @@ jobs:
             - checkout
             - run:
                 name: Creating Release
-                command: export LC_ALL=C.UTF-8 && export changelog=$(GITCHANGELOG_CONFIG_FILENAME=.gitchangelog.rc.release gitchangelog) && echo "Deploying v$BUILD_VERSION.$CIRCLE_BUILD_NUM to Github, with changelog:\n\n$changelog" && github-release release -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -t "v$BUILD_VERSION" -p --draft -d "$changelog" -n "Pre-Release v$BUILD_VERSION"
+                command: export LC_ALL=C.UTF-8 && export changelog=$(GITCHANGELOG_CONFIG_FILENAME=.gitchangelog.rc.release gitchangelog) && echo "Deploying v$BUILD_VERSION.$CIRCLE_BUILD_NUM to Github, with changelog:\n\n$changelog" && github-release release -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -t "v$BUILD_VERSION.$CIRCLE_BUILD_NUM" -p --draft -d "$changelog" -n "Pre-Release v$BUILD_VERSION.$CIRCLE_BUILD_NUM"
             - run:
                 name: Uploading Assets
-                command: cd _packages && ls Radarr.*.* | xargs -n1 -P0 -I{} -- github-release upload -u Radarr -r Radarr -t "v$BUILD_VERSION.$CIRCLE_BUILD_NUM" --name {} --file {}
+                command: cd _packages && ls Radarr.*.* | xargs -n1 -P0 -I{} -- github-release upload -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -t "v$BUILD_VERSION.$CIRCLE_BUILD_NUM" --name {} --file {}
 
 workflows:
     version: 2
