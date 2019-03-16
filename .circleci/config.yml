@@ -33,6 +33,7 @@ jobs:
             - run:
                 name: Build
                 command: ./build.sh Build
+                no_output_timeout: 30m
             - restore_cache:
                 keys:
                     - v1-npm-deps-{{ checksum "package.json" }}
